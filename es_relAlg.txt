@@ -1,0 +1,90 @@
+1/3
+• Where and when can we see the movie “Mad Max...”?
+- DROP(FILTER(Room, MovieTitle == "Mad Max"), MovieTitle) 
+
+• What are the movies directed by Welles?
+- DROP(DROP(FILTER(Movie, Director == "Welles"), Director), Actor)
+
+• Who are the actors of “Ran”?
+- DROP(DROP(FILTER(Movie, MovieTitle == "Ran"), Director), MovieTitle)
+
+• Where can we see a movie in which Signoret plays?
+- DROP(DROP(DROP(DROP( JOIN(Room, Movie, MovieTitle == MovieTitle), Actor == "Signoret"), Time), MovieTitle), Actor), Director) 
+
+• Among the actors who produced at least one movie?
+	Actors = DROP(DROP(Movie, MovieTitle), Director)
+	Producers = DROP(Producer, MovieTitle)
+
+ 	DROP(JOIN(Actors, Producers, ProducerName == Actor), ProducerName)
+
+• Among the actors who directed a movie that they played in?
+- DROP(DROP(FILTER(Movie, Director == Actor), MovieTitle) ,Director)
+
+• Who plays in one (or more) movie from Varda?
+- DROP(DROP(FILTER(Movie, Director == "Varda"), MovieTitle) ,Director)
+
+2/3
+• Who are the actors playing in all the films from Chloe' Zhao?
+	Actors = DROP(DROP(Movie, MovieTitle), Director)
+  	ZhaoMovies = DROP(DROP(FILTER(Movie, Director == "Zhao"), Director), Actor)
+    	AllPairs = PRODUCT(Actors, ZhaoMovies)
+    	MissingPairs = DIFFERENCE(AllPairs, Movie)
+    	ActorsNotInAll = DIFFERENCE(Actors, MissingPairs)
+    	ActorsInAll = DIFFERENCE(Actors, ActorsNotInAll)
+
+• Who produces all the movies from Kurosawa?
+	Producers = DROP(Producer, MovieTitle)
+	KurosawaMovies = DROP(DROP(FILTER(Movie, Director == "Kurosawa"), Director), Actor)
+    	AllPairs = PRODUCT(Producers, KurosawaMovies)
+   	MissingPairs = DIFFERENCE(AllPairs, Producers)
+    	ProducersNotInAll = DIFFERENCE(Producer,missingPairs)
+    	DIFFERENCE(Producer,producersNotInAll)
+
+• Who are the spectators watching all the movies?
+	MovieNames = DROP(DROP(Movie, Director), Actor)
+  	Spectators = DROP(Seen, MovieTitle)
+    	AllPairs = PRODUCT(MovieNames, Spectators)
+  	MissingPairs = DIFFERENCE(AllPairs, Seen)
+   	DIFFERENCE(Spectators, MissingPairs)
+
+• Among the spectators, who likes all the movies they see?
+- DIFFERENCE(Seen, DIFFERENCE(Seen, Like))
+
+• Where can we see Adele' Haenel after 16:00?
+	MoviesRoomAfter16 = DROP(FILTER(Room, Time>=16:00), Time)
+    	MoviesWithHaenel = RENAME(DROP(DROP(FILTER(Movie, Actor == Haenel), Director), Actor), movieTitle, movieTitleBis)
+   	DROP(FILTER(PRODUCT(moviesRoomAfter16, moviesWithHaenel), movieTitle == movieTitleBis), movieTitle, movieTitleBis])
+
+• What are the movies with no room projecting them?
+- DIFFERENCE(Movie, Rooms)                         
+
+3/3
+• Among the producers, who produces a movies shown nowhere?
+- DIFFERENCE(Producer, Room)
+
+• Among the producers who saw all the movies they directed?
+	MovieNames = DROP(DROP(Movie, Director), Actor)
+	Producers = DROP(Producer, MovieTitle)
+	Spectators = DROP(Seen, MovieTitle)
+
+    	AllPairs = PRODUCT(MovieNames, Spectators)
+   	MissingPairs = DIFFERENCE(AllPairs, Producer)
+    	DIFFERENCE(Producers, MissingPairs)
+
+• Among the spectators, who saw all the movies from Kurosawa?
+	KurosawaMovies = DROP(DROP(FILTER(Movie, Director == "Kurosawa"), Director), Actor)
+    	Spectators = DROP(Seen, MovieTitle)
+
+	AllPairs = PRODUCT(KurosawaMovies, Spectators)
+    	MissingPairs = DIFFERENCE(AllPairs, Seen)
+    	DIFFERENCE(Spectators, MissingPairs)
+
+• Among the spectators, who liked a movie they did not watch?
+- DROP(DIFFERENCE(Like, Seen), MovieTitle)
+
+• Among the spectators, who liked 0 movies?
+	Likers = DROP(Like, MovieTitle)
+	Spectators = DROP(Seen, MovieTitle)
+	DIFFERENCE(Spectators, Likers)
+
+
