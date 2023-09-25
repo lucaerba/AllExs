@@ -29,8 +29,7 @@
   	ZhaoMovies = DROP(DROP(FILTER(Movie, Director == "Zhao"), Director), Actor)
     	AllPairs = PRODUCT(Actors, ZhaoMovies)
     	MissingPairs = DIFFERENCE(AllPairs, Movie)
-    	ActorsNotInAll = DIFFERENCE(Actors, MissingPairs)
-    	ActorsInAll = DIFFERENCE(Actors, ActorsNotInAll)
+    	ActorsNotAll = DIFFERENCE(Actors, MissingPairs)
 
 • Who produces all the movies from Kurosawa?
 	Producers = DROP(Producer, MovieTitle)
@@ -86,5 +85,3 @@
 	Likers = DROP(Like, MovieTitle)
 	Spectators = DROP(Seen, MovieTitle)
 	DIFFERENCE(Spectators, Likers)
-
-
